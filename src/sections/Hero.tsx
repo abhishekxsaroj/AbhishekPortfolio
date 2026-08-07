@@ -2,27 +2,25 @@ import { DraggableFloat } from '@/components/hero/DraggableFloat'
 import { HeroSkillLogos } from '@/components/hero/HeroSkillLogos'
 import { RoleRotator } from '@/components/hero/RoleRotator'
 import { ScrollIndicator } from '@/components/layout/ScrollIndicator'
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider'
 import { MagneticButton } from '@/components/ui/MagneticButton'
 import { site } from '@/data/site'
 
 const headline = 'I build fast, modern and memorable web experiences.'
-
-function scrollTo(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
 
 type HeroProps = {
   ready?: boolean
 }
 
 export function Hero({ ready = true }: HeroProps) {
+  const { scrollTo } = useSmoothScroll()
   let letterIndex = 0
 
   return (
     <section
       id="top"
       aria-label="Hero"
-      className="relative flex min-h-dvh items-center overflow-x-clip pb-24 pt-28"
+      className="relative flex min-h-[75dvh] items-center overflow-x-clip pb-16 pt-24 md:min-h-dvh md:pb-24 md:pt-28"
     >
       <HeroSkillLogos active={ready} />
 
@@ -100,7 +98,7 @@ export function Hero({ ready = true }: HeroProps) {
               dropDelay={0.68}
               dropDistance={60}
             >
-              <MagneticButton onClick={() => scrollTo('work')}>View My Work</MagneticButton>
+              <MagneticButton onClick={() => scrollTo('#work')}>View My Work</MagneticButton>
             </DraggableFloat>
             <DraggableFloat
               label="Download Resume"
@@ -133,7 +131,7 @@ export function Hero({ ready = true }: HeroProps) {
             >
               <button
                 type="button"
-                onClick={() => scrollTo('creative')}
+                onClick={() => scrollTo('#creative')}
                 className="group inline-flex items-center gap-2 text-sm text-foreground-subtle transition-colors hover:text-foreground"
               >
                 Explore My Creative Side
@@ -149,7 +147,7 @@ export function Hero({ ready = true }: HeroProps) {
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center">
+      <div className="absolute inset-x-0 bottom-4 z-10 flex justify-center md:bottom-8">
         <DraggableFloat
           label="Scroll indicator"
           active={ready}

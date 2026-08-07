@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider'
 import { Hero } from '@/sections/Hero'
 
 const About = lazy(() =>
@@ -51,22 +52,13 @@ type HomePageProps = {
 
 export function HomePage({ ready }: HomePageProps) {
   const location = useLocation()
+  const { scrollTo } = useSmoothScroll()
 
   useEffect(() => {
     if (!location.hash) return
     const id = location.hash
-
-    const tryScroll = (attempts = 0) => {
-      const target = document.querySelector(id)
-      if (target instanceof HTMLElement) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        return
-      }
-      if (attempts < 24) window.setTimeout(() => tryScroll(attempts + 1), 50)
-    }
-
-    tryScroll()
-  }, [location.hash, location.pathname])
+    window.setTimeout(() => scrollTo(id, { offset: -88 }), 80)
+  }, [location.hash, location.pathname, scrollTo])
 
   return (
     <main id="main" className="relative">

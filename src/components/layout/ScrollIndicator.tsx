@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider'
 import { useScrolled } from '@/hooks/useScrollProgress'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { cn } from '@/lib/utils'
@@ -16,6 +17,7 @@ export function ScrollIndicator({
 }: ScrollIndicatorProps) {
   const scrolled = useScrolled(80)
   const prefersReducedMotion = useReducedMotion()
+  const { scrollTo } = useSmoothScroll()
 
   return (
     <motion.a
@@ -34,7 +36,7 @@ export function ScrollIndicator({
       )}
       onClick={(event) => {
         event.preventDefault()
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' })
+        scrollTo(href, { offset: -88 })
       }}
     >
       <span>{label}</span>
