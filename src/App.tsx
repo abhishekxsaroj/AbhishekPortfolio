@@ -23,10 +23,16 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    // Reset scroll on route changes. Home with a hash is handled in HomePage.
     if (location.pathname === '/projects') {
       window.scrollTo({ top: 0, behavior: 'auto' })
+      return
     }
-  }, [location.pathname])
+
+    if (location.pathname === '/' && !location.hash) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    }
+  }, [location.pathname, location.hash, location.key])
 
   return (
     <SmoothScrollProvider>

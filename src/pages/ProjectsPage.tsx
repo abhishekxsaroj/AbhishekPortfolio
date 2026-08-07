@@ -22,10 +22,10 @@ export function ProjectsPage() {
             </p>
           </div>
           <Link
-            to="/#work"
+            to="/"
             className="text-sm text-foreground-subtle transition-colors hover:text-foreground"
           >
-            ← Back to featured
+            ← Back to home
           </Link>
         </div>
 

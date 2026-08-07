@@ -78,6 +78,8 @@ export function Navigation() {
       return
     }
 
+    // Keep the address bar clean so refresh opens at the hero, not a section
+    window.history.replaceState(null, '', '/')
     window.setTimeout(runScroll, 60)
   }
 
@@ -176,7 +178,11 @@ export function Navigation() {
           >
             <Link
               to="/"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false)
+                window.history.replaceState(null, '', '/')
+                window.setTimeout(() => scrollTo(0, { immediate: true }), 0)
+              }}
               className="font-display text-sm font-semibold tracking-[-0.04em] text-foreground md:text-base"
             >
               Abhishek

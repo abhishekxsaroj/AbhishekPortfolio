@@ -21,10 +21,17 @@ export function HomePage({ ready }: HomePageProps) {
   const { scrollTo } = useSmoothScroll()
 
   useEffect(() => {
-    if (!location.hash) return
-    const id = location.hash
-    window.setTimeout(() => scrollTo(id, { offset: -88 }), 80)
-  }, [location.hash, location.pathname, scrollTo])
+    if (location.hash) {
+      const id = location.hash
+      // Wait for layout/fonts so section positions are correct on mobile
+      const timer = window.setTimeout(() => scrollTo(id, { offset: -88 }), 120)
+      return () => window.clearTimeout(timer)
+    }
+
+    // Fresh home visits (refresh, logo, back to "/") always start at the hero
+    scrollTo(0, { immediate: true })
+    return undefined
+  }, [location.hash, location.pathname, location.key, scrollTo])
 
   return (
     <main id="main" className="relative">

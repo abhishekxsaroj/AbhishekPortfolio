@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider'
 import { site } from '@/data/site'
 
 const links = [
@@ -12,6 +14,20 @@ const links = [
 
 export function Footer() {
   const year = new Date().getFullYear()
+  const navigate = useNavigate()
+  const { scrollTo } = useSmoothScroll()
+
+  const goToSection = (hash: string) => {
+    if (window.location.pathname !== '/') {
+      navigate({ pathname: '/', hash: hash.replace('#', '') })
+      window.setTimeout(() => scrollTo(hash, { offset: -88 }), 120)
+      return
+    }
+
+    // Scroll without leaving a sticky hash that hijacks the next refresh
+    window.history.replaceState(null, '', window.location.pathname)
+    scrollTo(hash, { offset: -88 })
+  }
 
   return (
     <footer className="relative border-t border-border/70 pt-12 pb-10">
@@ -35,7 +51,14 @@ export function Footer() {
             <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-foreground-muted">
               {links.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="transition-colors hover:text-foreground">
+                  <a
+                    href={link.href}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      goToSection(link.href)
+                    }}
+                    className="transition-colors hover:text-foreground"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -45,7 +68,9 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col justify-between gap-4 border-t border-border/60 pt-6 text-sm text-foreground-subtle md:flex-row md:items-center">
-          <p>© {year} {site.fullName}</p>
+          <p>
+            © {year} {site.fullName}
+          </p>
           <div className="flex flex-wrap items-center gap-4">
             <a
               href={site.linkedin}
@@ -69,7 +94,7 @@ export function Footer() {
             >
               Email
             </a>
-            <span className="uppercase tracking-[0.14em] text-[11px]">
+            <span className="text-[11px] tracking-[0.14em] uppercase">
               Designed &amp; developed by{' '}
               <span className="text-accent-soft">ABHISHEK</span>
             </span>

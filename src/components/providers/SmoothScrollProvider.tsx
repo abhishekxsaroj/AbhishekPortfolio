@@ -16,7 +16,7 @@ type ScrollToOptions = {
 }
 
 type SmoothScrollContextValue = {
-  scrollTo: (target: string | HTMLElement, options?: ScrollToOptions) => void
+  scrollTo: (target: string | number | HTMLElement, options?: ScrollToOptions) => void
   stop: () => void
   start: () => void
 }
@@ -25,6 +25,11 @@ const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(null)
 
 const fallbackScroll: SmoothScrollContextValue = {
   scrollTo: (target, options) => {
+    if (target === 0 || target === 'top' || target === '#top') {
+      window.scrollTo({ top: 0, behavior: options?.immediate ? 'auto' : 'smooth' })
+      return
+    }
+
     const offset = options?.offset ?? -88
     const element =
       typeof target === 'string' ? document.querySelector(target) : target
@@ -49,9 +54,19 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
   const lenisRef = useRef<Lenis | null>(null)
 
   const scrollTo = useCallback(
-    (target: string | HTMLElement, options?: ScrollToOptions) => {
+    (target: string | number | HTMLElement, options?: ScrollToOptions) => {
       const offset = options?.offset ?? -88
       const immediate = options?.immediate ?? prefersReducedMotion
+
+      if (target === 0 || target === 'top' || target === '#top') {
+        const lenis = lenisRef.current
+        if (lenis) {
+          lenis.start()
+          lenis.scrollTo(0, { immediate, duration: immediate ? 0 : 1.15 })
+        }
+        window.scrollTo({ top: 0, behavior: immediate ? 'auto' : 'smooth' })
+        return
+      }
 
       const run = (attempts = 0) => {
         const element =
@@ -88,6 +103,12 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
 
   const start = useCallback(() => {
     lenisRef.current?.start()
+  }, [])
+
+  useEffect(() => {
+    if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
   }, [])
 
   useEffect(() => {
