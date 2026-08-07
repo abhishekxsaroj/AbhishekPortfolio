@@ -28,6 +28,17 @@ export function Navigation() {
     setPortalReady(true)
   }, [])
 
+  // Never leave the mobile drawer open on desktop widths
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => {
+      if (media.matches) setOpen(false)
+    }
+    onChange()
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
+
   useEffect(() => {
     if (!open) {
       start()
@@ -67,24 +78,27 @@ export function Navigation() {
       return
     }
 
-    // Wait a beat so the menu unmounts and Lenis can scroll again
     window.setTimeout(runScroll, 60)
   }
 
   const mobileMenu =
     portalReady &&
     createPortal(
-      <AnimatePresence>
+      <AnimatePresence mode="sync">
         {open ? (
-          <div className="fixed inset-0 z-[200] lg:hidden" data-no-custom-cursor>
-            <motion.button
+          <motion.div
+            key="mobile-nav-overlay"
+            className="fixed inset-0 z-[200] lg:hidden"
+            data-no-custom-cursor
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
               type="button"
               aria-label="Close menu"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0 bg-black/70"
+              className="absolute inset-0 bg-black/40"
               onClick={() => setOpen(false)}
             />
 
@@ -93,20 +107,21 @@ export function Navigation() {
               role="dialog"
               aria-modal="true"
               aria-label="Mobile navigation"
-              initial={{ opacity: 0, y: -12 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-x-0 top-0 px-4 pt-[max(4.75rem,calc(env(safe-area-inset-top)+3.75rem))]"
             >
-              <div className="rounded-[1.25rem] border border-white/20 bg-[#050505] p-3 shadow-[0_24px_60px_rgb(0_0_0_/_0.85)]">
+              {/* Higher opacity only while the drawer is open */}
+              <div className="rounded-[1.25rem] border border-white/20 bg-[rgb(10_10_12_/_0.82)] p-3 shadow-[0_20px_50px_rgb(0_0_0_/_0.45)] backdrop-blur-2xl backdrop-saturate-150">
                 <ul className="flex flex-col gap-0.5">
                   {links.map((link) => (
                     <li key={link.href}>
                       <button
                         type="button"
                         onClick={() => goToSection(link.href)}
-                        className="flex w-full items-center rounded-[0.9rem] px-4 py-3.5 text-left text-[0.95rem] font-medium text-white transition-colors hover:bg-white/[0.08] active:bg-white/[0.14]"
+                        className="flex w-full items-center rounded-[0.9rem] px-4 py-3.5 text-left text-[0.95rem] font-medium text-foreground transition-colors hover:bg-white/[0.08] active:bg-white/[0.12]"
                       >
                         {link.label}
                       </button>
@@ -116,14 +131,14 @@ export function Navigation() {
                     <Link
                       to="/projects"
                       onClick={() => setOpen(false)}
-                      className="flex w-full items-center rounded-[0.9rem] px-4 py-3.5 text-[0.95rem] font-medium text-accent-soft transition-colors hover:bg-white/[0.08] active:bg-white/[0.14]"
+                      className="flex w-full items-center rounded-[0.9rem] px-4 py-3.5 text-[0.95rem] font-medium text-accent-soft transition-colors hover:bg-white/[0.08] active:bg-white/[0.12]"
                     >
                       See all projects
                     </Link>
                   </li>
                 </ul>
 
-                <div className="mt-2 border-t border-white/15 pt-3">
+                <div className="mt-2 border-t border-white/12 pt-3">
                   <button
                     type="button"
                     onClick={() => goToSection('#contact')}
@@ -134,7 +149,7 @@ export function Navigation() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         ) : null}
       </AnimatePresence>,
       document.body,
@@ -152,10 +167,11 @@ export function Navigation() {
           <nav
             aria-label="Primary"
             className={cn(
-              'flex items-center justify-between rounded-full px-4 py-3 transition-all duration-500 md:px-5',
-              scrolled || open
-                ? 'border border-border-strong bg-[#050505]/95 shadow-[0_10px_40px_rgb(0_0_0_/_0.45)] backdrop-blur-xl'
-                : 'bg-transparent',
+              'flex items-center justify-between rounded-full px-4 py-3 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 md:px-5',
+              // Light transparent glass — never a solid black bar
+              scrolled
+                ? 'border border-white/12 bg-white/[0.045] shadow-[0_8px_28px_rgb(0_0_0_/_0.18)] backdrop-blur-xl backdrop-saturate-150'
+                : 'border border-transparent bg-transparent',
             )}
           >
             <Link
@@ -195,7 +211,7 @@ export function Navigation() {
 
             <button
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-[#050505]/80 lg:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] backdrop-blur-md lg:hidden"
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label={open ? 'Close menu' : 'Open menu'}

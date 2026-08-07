@@ -1,0 +1,130 @@
+/* VS Code Dark+ inspired tokens for the playground editor */
+.playground-vscode {
+  --vscode-bg: #1e1e1e;
+  --vscode-sidebar: #252526;
+  --vscode-tab-bar: #2d2d2d;
+  --vscode-tab-active: #1e1e1e;
+  --vscode-tab-inactive: #2d2d2d;
+  --vscode-border: #3e3e42;
+  --vscode-fg: #d4d4d4;
+  --vscode-muted: #9d9d9d;
+  --vscode-line: #858585;
+  --vscode-selection: #264f78;
+  --vscode-accent: #007acc;
+}
+
+.playground-vscode .token.comment,
+.playground-vscode .token.prolog,
+.playground-vscode .token.doctype,
+.playground-vscode .token.cdata {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.playground-vscode .token.punctuation {
+  color: #d4d4d4;
+}
+
+.playground-vscode .token.namespace {
+  opacity: 0.85;
+}
+
+.playground-vscode .token.property,
+.playground-vscode .token.tag,
+.playground-vscode .token.boolean,
+.playground-vscode .token.number,
+.playground-vscode .token.constant,
+.playground-vscode .token.symbol,
+.playground-vscode .token.deleted {
+  color: #569cd6;
+}
+
+.playground-vscode .token.tag {
+  color: #569cd6;
+}
+
+.playground-vscode .token.attr-name,
+.playground-vscode .token.selector,
+.playground-vscode .token.char,
+.playground-vscode .token.builtin,
+.playground-vscode .token.inserted {
+  color: #9cdcfe;
+}
+
+.playground-vscode .token.operator,
+.playground-vscode .token.entity,
+.playground-vscode .token.url,
+.playground-vscode .language-css .token.string,
+.playground-vscode .style .token.string {
+  color: #d4d4d4;
+}
+
+.playground-vscode .token.atrule,
+.playground-vscode .token.attr-value,
+.playground-vscode .token.keyword {
+  color: #c586c0;
+}
+
+.playground-vscode .token.attr-value,
+.playground-vscode .token.string {
+  color: #ce9178;
+}
+
+.playground-vscode .token.function,
+.playground-vscode .token.class-name {
+  color: #dcdcaa;
+}
+
+.playground-vscode .token.regex,
+.playground-vscode .token.important,
+.playground-vscode .token.variable {
+  color: #d16969;
+}
+
+.playground-vscode .token.important,
+.playground-vscode .token.bold {
+  font-weight: 600;
+}
+
+.playground-vscode .token.italic {
+  font-style: italic;
+}
+
+.playground-vscode .token.entity {
+  cursor: help;
+}
+
+/* react-simple-code-editor layout */
+.playground-editor {
+  font-family: Consolas, 'Courier New', ui-monospace, monospace !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  caret-color: #aeafad;
+  outline: none;
+  min-height: 220px;
+  flex: 1 1 auto;
+  overflow: auto !important;
+  background: var(--vscode-bg) !important;
+  color: var(--vscode-fg);
+}
+
+.playground-editor textarea {
+  outline: none !important;
+  padding: 14px 16px !important;
+}
+
+.playground-editor pre {
+  padding: 14px 16px !important;
+}
+
+@media (min-width: 768px) {
+  .playground-editor {
+    font-size: 13.5px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .playground-editor {
+    min-height: 0;
+  }
+}

@@ -1,9 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
+import Editor from 'react-simple-code-editor'
+import { highlight, languages } from 'prismjs'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-javascript'
 import { playgroundSnippets, type PlaygroundSnippet } from '@/data/playground'
 import { cn } from '@/lib/utils'
+import '@/styles/playground.css'
 
 type Pane = 'html' | 'css' | 'js'
 type MobileView = 'code' | 'preview'
+
+const paneMeta: Record<Pane, { label: string; file: string; language: string }> = {
+  html: { label: 'HTML', file: 'index.html', language: 'markup' },
+  css: { label: 'CSS', file: 'styles.css', language: 'css' },
+  js: { label: 'JS', file: 'script.js', language: 'javascript' },
+}
 
 function buildDocument(html: string, css: string, js: string) {
   return `<!DOCTYPE html>
@@ -24,6 +36,18 @@ ${js}
 </script>
 </body>
 </html>`
+}
+
+function highlightCode(code: string, pane: Pane) {
+  const language = languages[paneMeta[pane].language] ?? languages.markup
+  try {
+    return highlight(code, language, paneMeta[pane].language)
+  } catch {
+    return code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+  }
 }
 
 export function CodePlayground() {
@@ -77,9 +101,9 @@ export function CodePlayground() {
     pane === 'html' ? setDraftHtml : pane === 'css' ? setDraftCss : setDraftJs
 
   return (
-    <div className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-white/[0.02]">
-      <div className="border-b border-white/8 px-3 py-3 md:px-4">
-        <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-foreground-subtle">
+    <div className="playground-vscode overflow-hidden rounded-[1.25rem] border border-white/14 bg-[#1a1a1c]/92 shadow-[0_20px_50px_rgb(0_0_0_/_0.35)] backdrop-blur-md">
+      <div className="border-b border-[var(--vscode-border)] bg-[var(--vscode-sidebar)] px-3 py-3 md:px-4">
+        <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--vscode-muted)]">
           Templates
         </p>
         <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -89,10 +113,10 @@ export function CodePlayground() {
               type="button"
               onClick={() => loadSnippet(snippet)}
               className={cn(
-                'shrink-0 rounded-full px-3 py-2 text-xs transition-colors',
+                'shrink-0 rounded-md px-3 py-2 text-xs transition-colors',
                 snippet.id === activeId
                   ? 'bg-accent text-canvas'
-                  : 'border border-white/10 text-foreground-muted hover:border-white/20 hover:text-foreground',
+                  : 'border border-white/12 bg-white/[0.04] text-[var(--vscode-muted)] hover:border-white/20 hover:text-[var(--vscode-fg)]',
               )}
             >
               {snippet.title}
@@ -101,17 +125,17 @@ export function CodePlayground() {
         </div>
       </div>
 
-      <div className="flex gap-2 border-b border-white/8 px-3 py-2 lg:hidden">
+      <div className="flex gap-2 border-b border-[var(--vscode-border)] bg-[var(--vscode-tab-bar)] px-3 py-2 lg:hidden">
         {(['code', 'preview'] as const).map((view) => (
           <button
             key={view}
             type="button"
             onClick={() => setMobileView(view)}
             className={cn(
-              'min-h-10 flex-1 rounded-lg px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors',
+              'min-h-10 flex-1 rounded-md px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors',
               mobileView === view
-                ? 'bg-white/[0.08] text-foreground'
-                : 'text-foreground-subtle',
+                ? 'bg-[var(--vscode-tab-active)] text-[var(--vscode-fg)]'
+                : 'text-[var(--vscode-muted)]',
             )}
           >
             {view}
@@ -122,61 +146,82 @@ export function CodePlayground() {
       <div className="grid lg:min-h-[520px] lg:grid-cols-2">
         <div
           className={cn(
-            'min-h-[260px] flex-col border-white/8 lg:flex lg:min-h-0 lg:border-r',
+            'min-h-[280px] flex-col border-[var(--vscode-border)] bg-[var(--vscode-bg)] lg:flex lg:min-h-0 lg:border-r',
             mobileView === 'code' ? 'flex' : 'hidden lg:flex',
           )}
         >
-          <div className="flex items-center justify-between gap-2 border-b border-white/8 px-3 py-2">
-            <div className="flex gap-1">
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--vscode-border)] bg-[var(--vscode-tab-bar)]">
+            <div className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {(['html', 'css', 'js'] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"
                   onClick={() => setPane(tab)}
                   className={cn(
-                    'min-h-10 rounded-md px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors',
+                    'relative min-h-10 shrink-0 border-r border-[var(--vscode-border)] px-3.5 py-2.5 text-left text-xs transition-colors',
                     pane === tab
-                      ? 'bg-white/[0.08] text-foreground'
-                      : 'text-foreground-subtle hover:text-foreground',
+                      ? 'bg-[var(--vscode-tab-active)] text-[var(--vscode-fg)]'
+                      : 'bg-[var(--vscode-tab-inactive)] text-[var(--vscode-muted)] hover:text-[var(--vscode-fg)]',
                   )}
                 >
-                  {tab}
+                  <span className="font-mono tracking-tight">{paneMeta[tab].file}</span>
+                  {pane === tab ? (
+                    <span className="absolute inset-x-0 top-0 h-0.5 bg-[var(--vscode-accent)]" />
+                  ) : null}
                 </button>
               ))}
             </div>
             <button
               type="button"
               onClick={resetSnippet}
-              className="min-h-10 px-2 text-xs text-foreground-subtle transition-colors hover:text-accent-soft"
+              className="min-h-10 shrink-0 px-3 text-xs text-[var(--vscode-muted)] transition-colors hover:text-accent-soft"
             >
               Reset
             </button>
           </div>
 
+          <div className="flex items-center gap-2 border-b border-[var(--vscode-border)] bg-[var(--vscode-bg)] px-3 py-1.5">
+            <span className="font-mono text-[10px] text-[var(--vscode-muted)]">
+              {paneMeta[pane].label}
+            </span>
+            <span className="text-[10px] text-white/20">·</span>
+            <span className="truncate font-mono text-[10px] text-[var(--vscode-line)]">
+              {paneMeta[pane].file}
+            </span>
+          </div>
+
           <label className="sr-only" htmlFor="playground-code">
-            {pane.toUpperCase()} code
+            {paneMeta[pane].label} code
           </label>
-          <textarea
-            id="playground-code"
-            spellCheck={false}
+          <Editor
             value={currentValue}
-            onChange={(event) => onChange(event.target.value)}
-            className="min-h-[220px] flex-1 resize-none bg-transparent px-4 py-3 font-mono text-[12px] leading-relaxed text-[#e8e0d4] outline-none md:text-[13px] lg:min-h-0"
+            onValueChange={onChange}
+            highlight={(code) => highlightCode(code, pane)}
+            padding={0}
+            textareaId="playground-code"
+            className="playground-editor"
+            textareaClassName="focus:outline-none"
+            preClassName="language-markup"
+            style={{
+              fontFamily: "Consolas, 'Courier New', ui-monospace, monospace",
+              fontSize: 13,
+              minHeight: 220,
+            }}
           />
 
-          <p className="border-t border-white/8 px-4 py-2 text-[11px] text-foreground-subtle">
+          <p className="border-t border-[var(--vscode-border)] bg-[var(--vscode-sidebar)] px-4 py-2 text-[11px] text-[var(--vscode-muted)]">
             {activeSnippet.description} Edit freely — preview updates as you type.
           </p>
         </div>
 
         <div
           className={cn(
-            'min-h-[260px] flex-col bg-[#07060a] lg:flex lg:min-h-0',
+            'min-h-[260px] flex-col bg-[#111113] lg:flex lg:min-h-0',
             mobileView === 'preview' ? 'flex' : 'hidden lg:flex',
           )}
         >
-          <div className="flex items-center justify-between border-b border-white/8 px-3 py-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground-subtle">
+          <div className="flex items-center justify-between border-b border-[var(--vscode-border)] bg-[var(--vscode-tab-bar)] px-3 py-2">
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--vscode-muted)]">
               Live preview
             </p>
             <span className="inline-flex items-center gap-1.5 text-[10px] text-accent-soft">
