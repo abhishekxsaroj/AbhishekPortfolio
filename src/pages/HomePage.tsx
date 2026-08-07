@@ -1,50 +1,16 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSmoothScroll } from '@/components/providers/SmoothScrollProvider'
+import { About } from '@/sections/About'
+import { Achievements } from '@/sections/Achievements'
+import { Contact } from '@/sections/Contact'
+import { CreativeCorner } from '@/sections/CreativeCorner'
+import { Experience } from '@/sections/Experience'
+import { FeaturedProjects } from '@/sections/FeaturedProjects'
 import { Hero } from '@/sections/Hero'
-
-const About = lazy(() =>
-  import('@/sections/About').then((module) => ({ default: module.About })),
-)
-const FeaturedProjects = lazy(() =>
-  import('@/sections/FeaturedProjects').then((module) => ({
-    default: module.FeaturedProjects,
-  })),
-)
-const TechStack = lazy(() =>
-  import('@/sections/TechStack').then((module) => ({ default: module.TechStack })),
-)
-const Playground = lazy(() =>
-  import('@/sections/Playground').then((module) => ({ default: module.Playground })),
-)
-const Experience = lazy(() =>
-  import('@/sections/Experience').then((module) => ({ default: module.Experience })),
-)
-const Process = lazy(() =>
-  import('@/sections/Process').then((module) => ({ default: module.Process })),
-)
-const Achievements = lazy(() =>
-  import('@/sections/Achievements').then((module) => ({ default: module.Achievements })),
-)
-const CreativeCorner = lazy(() =>
-  import('@/sections/CreativeCorner').then((module) => ({
-    default: module.CreativeCorner,
-  })),
-)
-const Contact = lazy(() =>
-  import('@/sections/Contact').then((module) => ({ default: module.Contact })),
-)
-
-function SectionFallback() {
-  return (
-    <div
-      aria-hidden="true"
-      className="mx-auto max-w-6xl px-5 py-24 md:px-8 md:py-32"
-    >
-      <div className="h-40 animate-pulse rounded-[var(--radius-xl)] border border-border bg-white/[0.02]" />
-    </div>
-  )
-}
+import { Playground } from '@/sections/Playground'
+import { Process } from '@/sections/Process'
+import { TechStack } from '@/sections/TechStack'
 
 type HomePageProps = {
   ready: boolean
@@ -63,34 +29,15 @@ export function HomePage({ ready }: HomePageProps) {
   return (
     <main id="main" className="relative">
       <Hero ready={ready} />
-
-      <Suspense fallback={<SectionFallback />}>
-        <About />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <FeaturedProjects />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <TechStack />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <Playground />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <Experience />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <Process />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <Achievements />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <CreativeCorner />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <Contact />
-      </Suspense>
+      <About />
+      <FeaturedProjects />
+      <TechStack />
+      <Playground />
+      <Experience />
+      <Process />
+      <Achievements />
+      <CreativeCorner />
+      <Contact />
     </main>
   )
 }

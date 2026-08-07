@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import Editor from 'react-simple-code-editor'
+import SimpleCodeEditor from 'react-simple-code-editor'
 import { highlight, languages } from 'prismjs'
 import 'prismjs/components/prism-markup'
 import 'prismjs/components/prism-css'
@@ -7,6 +7,13 @@ import 'prismjs/components/prism-javascript'
 import { playgroundSnippets, type PlaygroundSnippet } from '@/data/playground'
 import { cn } from '@/lib/utils'
 import '@/styles/playground.css'
+
+// Package is CJS; Vite/Rolldown can resolve the import as `{ default: Component }`.
+const Editor =
+  typeof SimpleCodeEditor === 'function'
+    ? SimpleCodeEditor
+    : ((SimpleCodeEditor as unknown as { default: typeof SimpleCodeEditor }).default ??
+      SimpleCodeEditor)
 
 type Pane = 'html' | 'css' | 'js'
 type MobileView = 'code' | 'preview'

@@ -3,7 +3,6 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import { Footer } from '@/components/layout/Footer'
 import { Navigation } from '@/components/layout/Navigation'
 import { SiteWatermark } from '@/components/layout/SiteWatermark'
-import { IdlePrefetch } from '@/components/providers/IdlePrefetch'
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider'
 import { AnimatedCursor } from '@/components/ui/AnimatedCursor'
 import { GradientBackground } from '@/components/ui/GradientBackground'
@@ -19,7 +18,6 @@ export default function App() {
   const handleLoaderDone = useCallback(() => setReady(true), [])
 
   useEffect(() => {
-    // Safety net so content never stays invisible if the loader stalls
     const timer = window.setTimeout(() => setReady(true), 2500)
     return () => window.clearTimeout(timer)
   }, [])
@@ -42,7 +40,6 @@ export default function App() {
       <GradientBackground />
       <AnimatedCursor />
       <SiteWatermark />
-      <IdlePrefetch />
       <Navigation />
 
       <PageTransition ready={ready}>
