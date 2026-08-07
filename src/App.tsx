@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { Footer } from '@/components/layout/Footer'
 import { Navigation } from '@/components/layout/Navigation'
@@ -16,16 +16,23 @@ import { ProjectsPage } from '@/pages/ProjectsPage'
 export default function App() {
   const [ready, setReady] = useState(false)
   const location = useLocation()
+  const handleLoaderDone = useCallback(() => setReady(true), [])
+
+  useEffect(() => {
+    // Safety net so content never stays invisible if the loader stalls
+    const timer = window.setTimeout(() => setReady(true), 2500)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     if (location.pathname === '/projects') {
-      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' })
+      window.scrollTo({ top: 0, behavior: 'auto' })
     }
   }, [location.pathname])
 
   return (
     <SmoothScrollProvider>
-      <PageLoader onDone={() => setReady(true)} />
+      <PageLoader onDone={handleLoaderDone} />
       <ScrollProgress />
 
       <a href="#main" className="skip-link">

@@ -24,12 +24,11 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return
+          // Keep react/react-dom together with the graph — splitting them
+          // can blank the production app with Vite/Rolldown.
           if (id.includes('framer-motion')) return 'vendor-motion'
           if (id.includes('lenis')) return 'vendor-lenis'
           if (id.includes('react-router')) return 'vendor-router'
-          if (id.includes('react-dom') || id.includes('/react/')) {
-            return 'vendor-react'
-          }
         },
       },
     },

@@ -23,12 +23,21 @@ type SmoothScrollContextValue = {
 
 const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(null)
 
+const fallbackScroll: SmoothScrollContextValue = {
+  scrollTo: (target, options) => {
+    const offset = options?.offset ?? -88
+    const element =
+      typeof target === 'string' ? document.querySelector(target) : target
+    if (!(element instanceof HTMLElement)) return
+    const top = element.getBoundingClientRect().top + window.scrollY + offset
+    window.scrollTo({ top, behavior: options?.immediate ? 'auto' : 'smooth' })
+  },
+  stop: () => {},
+  start: () => {},
+}
+
 export function useSmoothScroll() {
-  const context = useContext(SmoothScrollContext)
-  if (!context) {
-    throw new Error('useSmoothScroll must be used within SmoothScrollProvider')
-  }
-  return context
+  return useContext(SmoothScrollContext) ?? fallbackScroll
 }
 
 type SmoothScrollProviderProps = {

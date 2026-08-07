@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 type PageLoaderProps = {
@@ -9,29 +9,45 @@ type PageLoaderProps = {
 export function PageLoader({ onDone }: PageLoaderProps) {
   const [visible, setVisible] = useState(true)
   const prefersReducedMotion = useReducedMotion()
+  const doneRef = useRef(false)
 
   useEffect(() => {
-    const minTime = prefersReducedMotion ? 200 : 1100
+    const minTime = prefersReducedMotion ? 200 : 900
+    const maxTime = prefersReducedMotion ? 600 : 2200
     const start = performance.now()
+    const timers: number[] = []
+
+    const complete = () => {
+      if (doneRef.current) return
+      doneRef.current = true
+      setVisible(false)
+      onDone?.()
+    }
 
     const finish = () => {
       const elapsed = performance.now() - start
       const wait = Math.max(0, minTime - elapsed)
-      window.setTimeout(() => {
-        setVisible(false)
-        onDone?.()
-      }, wait)
+      timers.push(window.setTimeout(complete, wait))
     }
 
-    if (document.readyState === 'complete') finish()
-    else window.addEventListener('load', finish, { once: true })
+    if (document.readyState === 'complete') {
+      finish()
+    } else {
+      window.addEventListener('load', finish, { once: true })
+    }
 
-    return () => window.removeEventListener('load', finish)
+    // Never leave users on a black screen if fonts/assets stall
+    timers.push(window.setTimeout(complete, maxTime))
+
+    return () => {
+      window.removeEventListener('load', finish)
+      timers.forEach((id) => window.clearTimeout(id))
+    }
   }, [onDone, prefersReducedMotion])
 
   return (
     <AnimatePresence>
-      {visible && (
+      {visible ? (
         <motion.div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas"
           initial={{ opacity: 1 }}
@@ -65,7 +81,7 @@ export function PageLoader({ onDone }: PageLoaderProps) {
             </motion.p>
           </div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   )
 }
